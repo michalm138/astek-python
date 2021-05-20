@@ -7,12 +7,16 @@ class Menu(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
 
+    @property
+    def dishes_count(self):
+        return Dish.objects.filter(menu=self).count()
+
     def __str__(self):
         return self.name
 
 
 class Dish(models.Model):
-    menu = models.ForeignKey('Menu', on_delete=models.CASCADE)
+    menu = models.ForeignKey('Menu', related_name='dishes', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=9, decimal_places=2)

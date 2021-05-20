@@ -9,5 +9,6 @@ urlpatterns = [
     path('private/create/dish/', views.CreateDish.as_view(), name='create-dish'),
     path('private/delete/dish/<int:pk>/', views.DeleteDish.as_view(), name='delete-dish'),
     path('private/update/dish/<int:pk>/', views.UpdateDish.as_view(), name='update-dish'),
-    # Publuc API endpoints
+    # Public API endpoints
+    path('public/list/menus/', views.MenuList.as_view(), name='list-menus')
 ]

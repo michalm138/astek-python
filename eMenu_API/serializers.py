@@ -12,11 +12,20 @@ class DishSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Dish
+        fields = '__all__'
+
+
+class MenuListSerializer(serializers.ModelSerializer):
+    dishes = DishSerializer(many=True)
+
+    class Meta:
+        model = models.Menu
         fields = [
-            'menu',
+            'id',
             'name',
             'description',
-            'price',
-            'preparation_time',
-            'vegetarian',
+            'creation_date',
+            'update_date',
+            'dishes_count',
+            'dishes',
         ]

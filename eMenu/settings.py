@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'eMenu_API',
     'rest_framework',
+    "django_filters",
 ]
 
 MIDDLEWARE = [
@@ -114,7 +115,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
@@ -128,7 +128,7 @@ REST_FRAMEWORK = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'UTC+2'
 
 USE_I18N = True
 
