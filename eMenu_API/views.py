@@ -52,7 +52,7 @@ class MenuOrdering(filters.OrderingFilter):
         ordering = self.get_ordering(request, queryset, view)
         if ordering:
             if 'dishes_count' in ordering or '-dishes_count' in ordering:
-                objects = {menu:models.Dish.objects.filter(menu=menu).count() for menu in queryset}
+                objects = {menu:menu.dishes.count() for menu in queryset}
                 dishes_count = [count for obj, count in objects.items()]
                 if ordering[0][0] == '-':
                     dishes_count.sort(reverse=True)
