@@ -19,47 +19,72 @@ def connect_to_db():
 
     return conn
 
-def send_email():
-    try:
-        conn = connect_to_db()
-        cur = conn.cursor()
 
-        # Collecting data
+def get_emails(connection):
+    try:
+        cur = connection.cursor()
         cur.execute("select email from auth_user")
         user_emails = [item[0] for item in cur.fetchall()]
         if user_emails: 
-            print(datetime.datetime.today(),'*** User emails has been fetched successfully')
+            print(datetime.datetime.today(),'*** User emails have been fetched successfully')
+    except Exception as e:
+        print(datetime.datetime.today(),'*** Error:', e)
+    finally:
+        return user_emails
 
-        cur.execute("select id, name from \"eMenu_API_menu\"")
-        menus = {item[0]:item[1] for item in cur.fetchall()}
-        if user_emails: 
-            print(datetime.datetime.today(),'*** Menus has been fetched successfully')
-        
+
+def get_dishes(connection):
+    try:
         yesterday_start_day = str(datetime.datetime.today().date()-datetime.timedelta(days=1)) + ' 00:00:00'
         yesterday_end_day = str(datetime.datetime.today().date()-datetime.timedelta(days=1)) + ' 23:59:59'
-        cur.execute(f"select * from \"eMenu_API_dish\" where (creation_date > timestamp '{yesterday_start_day}' and creation_date < timestamp '{yesterday_end_day}') or (update_date > timestamp '{yesterday_start_day}' and update_date < timestamp '{yesterday_end_day}')")
         dishes = []
-        for item in cur.fetchall():
-            data = {}
-            data['name'] = item[1]
-            data['description'] = item[2]
-            data['price'] = '$' + str(item[3])
-            if item[4] == 1:
-                data['preparation_time'] = str(item[4]) + ' min'
-            else:
-                data['preparation_time'] = str(item[4]) + ' mins'
-            if item[7]:
-                data['vegetarian'] = 'Yes'
-            else:
-                data['vegetarian'] = 'No'
-            data['menu'] = menus[item[8]]
-            dishes.append(data)
-        if dishes:
-            print(datetime.datetime.today(),'*** Dishes has been fetched successfully')
-        else:
-            print(datetime.datetime.today(),'*** There\'s no changes')
 
-        # Sending email
+        cur = connection.cursor()
+        cur.execute(f"""
+        select emad.name, emad.description, emad.price, emad.preparation_time, emad.vegetarian, emam.name, emad.creation_date, emad.update_date 
+        from "eMenu_API_dish" emad
+        inner join "eMenu_API_menu" emam on emad.menu_id = emam.id
+        where (emad.creation_date > timestamp '{yesterday_start_day}' and emad.creation_date < timestamp '{yesterday_end_day}') or (emad.update_date > timestamp '{yesterday_start_day}' and emad.update_date < timestamp '{yesterday_end_day}')
+        """)
+        for field in cur.fetchall():
+            data = {}
+            data['name'] = field[0]
+            data['description'] = field[1]
+            data['price'] = field[2]
+            data['preparation_time'] = field[3]
+            data['vegetarian'] = field[4]
+            data['menu'] = field[5]
+            dishes.append(data)
+        if dishes: 
+            print(datetime.datetime.today(),'*** Dishes have been fetched successfully')
+    except Exception as e:
+        print(datetime.datetime.today(),'*** Error:', e)
+    finally:
+        return dishes
+
+
+def send_emails(user_emails, email_port, email_pass, email_context, email_message):
+    try:
+         with smtplib.SMTP_SSL('smtp.gmail.com', email_port, context=email_context) as server:
+            server.login(os.getenv('EMAIL_USER'), email_pass)
+            print(datetime.datetime.today(),'*** Sending emails...')
+            for email in user_emails:
+                server.sendmail(os.getenv('EMAIL_USER'), email, email_message)
+            server.quit()
+    except Exception as e:
+        print(datetime.datetime.today(),'*** Error:', e)
+    finally:
+        print(datetime.datetime.today(),'*** Emails have been sent successfully')
+
+def main():
+    try:
+        conn = connect_to_db()
+
+        user_emails = get_emails(conn)
+        dishes = get_dishes(conn)
+
+        conn.close()
+
         email_port = 465
         email_pass = os.getenv('EMAIL_PASS')
         email_context = ssl.create_default_context()
@@ -69,26 +94,23 @@ def send_email():
                 email_message += '------------------------\n'
                 email_message += 'Name: ' + dish['name'] + '\n'
                 email_message += 'Description: ' + dish['description'] + '\n'
-                email_message += 'Price: ' + dish['price'] + '\n'
-                email_message += 'Preparation time: ' + dish['preparation_time'] + '\n'
-                email_message += 'Vegetarian: ' + dish['vegetarian'] + '\n'
+                email_message += 'Price: $' + str(dish['price']) + '\n'
+                email_message += 'Preparation time: ' + str(dish['preparation_time']) + ' min\n'
+                if dish['vegetarian']:
+                    email_message += 'Vegetarian: Yes\n'
+                else:
+                    email_message += 'Vegetarian: No\n'
                 email_message += 'You can find it in menu: ' + dish['menu'] + '\n'
         else:
             email_message += 'Sorry! There\'s no changes'
 
-        with smtplib.SMTP_SSL('smtp.gmail.com', email_port, context=email_context) as server:
-            server.login(os.getenv('EMAIL_USER'), os.getenv('EMAIL_PASS'))
-            print(datetime.datetime.today(),'*** Sending emails...')
-            for email in user_emails:
-                server.sendmail(os.getenv('EMAIL_USER'), email, email_message)
-            print(datetime.datetime.today(),'*** Emails have been sent successfully\n')
-            server.quit()
-    except:
-        print(datetime.datetime.today(),'*** Error! Something went wrong...')
+        send_emails(user_emails, email_port, email_pass, email_context, email_message)
+    except Exception as e:
+        print(datetime.datetime.today(),'*** Error:', e)
     finally:
-        conn.close()
+        print('*** Done! ***\n')
 
-schedule.every().day.at("10:00").do(send_email)
+schedule.every().day.at("10:00").do(main)
 
 if __name__ == '__main__':
     while True:
