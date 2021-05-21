@@ -44,9 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'eMenu_API',
     'rest_framework',
-    "django_filters",
+    'django_filters',
+    'eMenu_API',
 ]
 
 MIDDLEWARE = [
@@ -114,8 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-    ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
