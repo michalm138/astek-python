@@ -26,6 +26,5 @@ class MenuListSerializer(serializers.ModelSerializer):
             'description',
             'creation_date',
             'update_date',
-            'dishes_count',
             'dishes',
         ]
