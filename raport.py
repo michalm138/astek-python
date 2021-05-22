@@ -35,8 +35,9 @@ def get_emails(connection):
 
 def get_dishes(connection):
     try:
-        yesterday_start_day = str(datetime.datetime.today().date()-datetime.timedelta(days=1)) + ' 00:00:00'
-        yesterday_end_day = str(datetime.datetime.today().date()-datetime.timedelta(days=1)) + ' 23:59:59'
+        yesterday = str(datetime.datetime.today().date()-datetime.timedelta(days=1))
+        yesterday_start = yesterday + ' 00:00:00'
+        yesterday_end = yesterday + ' 23:59:59'
         dishes = []
 
         cur = connection.cursor()
@@ -44,7 +45,7 @@ def get_dishes(connection):
         select emad.name, emad.description, emad.price, emad.preparation_time, emad.vegetarian, emam.name, emad.creation_date, emad.update_date 
         from "eMenu_API_dish" emad
         inner join "eMenu_API_menu" emam on emad.menu_id = emam.id
-        where (emad.creation_date > timestamp '{yesterday_start_day}' and emad.creation_date < timestamp '{yesterday_end_day}') or (emad.update_date > timestamp '{yesterday_start_day}' and emad.update_date < timestamp '{yesterday_end_day}')
+        where (emad.creation_date > timestamp '{yesterday_start}' and emad.creation_date < timestamp '{yesterday_end}') or (emad.update_date > timestamp '{yesterday_start}' and emad.update_date < timestamp '{yesterday_end}')
         """)
         for field in cur.fetchall():
             data = {}
@@ -70,11 +71,11 @@ def send_emails(user_emails, email_port, email_pass, email_context, email_messag
             print(datetime.datetime.today(),'*** Sending emails...')
             for email in user_emails:
                 server.sendmail(os.getenv('EMAIL_USER'), email, email_message)
+            print(datetime.datetime.today(),'*** Emails have been sent successfully')
             server.quit()
     except Exception as e:
         print(datetime.datetime.today(),'*** Error:', e)
-    finally:
-        print(datetime.datetime.today(),'*** Emails have been sent successfully')
+        
 
 def main():
     try:
