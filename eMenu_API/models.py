@@ -29,7 +29,7 @@ class Dish(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
     vegetarian = models.BooleanField()
-    image = models.ImageField(upload_to='dish_images/', null=True, blank=True)
+    image = models.ImageField(null=True, blank=True)
 
     class Meta:
         verbose_name_plural = 'Dishes'
