@@ -58,19 +58,21 @@ def get_dishes(connection):
             dishes.append(data)
         if dishes: 
             print(datetime.datetime.today(),'*** Dishes have been fetched successfully')
+        else:
+            print(datetime.datetime.today(),'*** Dishes have no changes')
     except Exception as e:
         print(datetime.datetime.today(),'*** Error:', e)
     finally:
         return dishes
 
 
-def send_emails(user_emails, email_port, email_pass, email_context, email_message):
+def send_emails(user_emails, email_host, email_port, email_user, email_pass, email_context, email_message):
     try:
-         with smtplib.SMTP_SSL('smtp.gmail.com', email_port, context=email_context) as server:
-            server.login(os.getenv('EMAIL_USER'), email_pass)
+         with smtplib.SMTP_SSL(email_host, email_port, context=email_context) as server:
+            server.login(email_user, email_pass)
             print(datetime.datetime.today(),'*** Sending emails...')
             for email in user_emails:
-                server.sendmail(os.getenv('EMAIL_USER'), email, email_message)
+                server.sendmail(email_user, email, email_message)
             print(datetime.datetime.today(),'*** Emails have been sent successfully')
             server.quit()
     except Exception as e:
@@ -86,7 +88,9 @@ def main():
 
         conn.close()
 
-        email_port = 465
+        email_host = os.getenv('EMAIL_HOST')
+        email_port = os.getenv('EMAIL_PORT')
+        email_user = os.getenv('EMAIL_USER')
         email_pass = os.getenv('EMAIL_PASS')
         email_context = ssl.create_default_context()
         email_message = 'Hello!\nGet yesterday\'s updates!\n\n'
@@ -105,7 +109,7 @@ def main():
         else:
             email_message += 'Sorry! There\'s no changes'
 
-        send_emails(user_emails, email_port, email_pass, email_context, email_message)
+        send_emails(user_emails, email_host, email_port, email_user, email_pass, email_context, email_message)
     except Exception as e:
         print(datetime.datetime.today(),'*** Error:', e)
     finally:
