@@ -27,10 +27,9 @@ def get_emails(connection):
         user_emails = [item[0] for item in cur.fetchall()]
         if user_emails: 
             print(datetime.datetime.today(),'*** User emails have been fetched successfully')
+        return user_emails
     except Exception as e:
         print(datetime.datetime.today(),'*** Error:', e)
-    finally:
-        return user_emails
 
 
 def get_dishes(connection):
@@ -60,10 +59,9 @@ def get_dishes(connection):
             print(datetime.datetime.today(),'*** Dishes have been fetched successfully')
         else:
             print(datetime.datetime.today(),'*** Dishes have no changes')
+        return dishes
     except Exception as e:
         print(datetime.datetime.today(),'*** Error:', e)
-    finally:
-        return dishes
 
 
 def send_emails(user_emails, email_host, email_port, email_user, email_pass, email_context, email_message):
@@ -110,10 +108,10 @@ def main():
             email_message += 'Sorry! There\'s no changes'
 
         send_emails(user_emails, email_host, email_port, email_user, email_pass, email_context, email_message)
+        print('*** Done! ***\n')
     except Exception as e:
         print(datetime.datetime.today(),'*** Error:', e)
-    finally:
-        print('*** Done! ***\n')
+
 
 schedule.every().day.at("10:00").do(main)
 
