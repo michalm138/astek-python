@@ -47,8 +47,8 @@ You can easily fill the database with sample data by running script:
 python data_initialization.py
 ```
 
-### Email raport system:
+### Email report system:
 To run the script which sends email raports every day at 10.00 am use command:
 ```
-python raport.py
+python report.py
 ```
