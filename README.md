@@ -1,7 +1,7 @@
 # ASTEK - Python task
 
 ### Setup:
-Install all necessary modules. I prefer to use a virtual environment.
+Install all necessary modules. I recommend you to use a virtual environment.
 ```
 pip install -r requirements.txt
 ```
@@ -48,7 +48,7 @@ python data_initialization.py
 ```
 
 ### Email report system:
-To run the script which sends email raports every day at 10.00 am use command:
+To run the script which sends email reports every day at 10.00 am use command:
 ```
 python report.py
 ```
