@@ -1,4 +1,4 @@
-# ASTEK - Python task
+# eMenu-rest-api
 
 ### Setup:
 Install all necessary modules. I recommend you to use a virtual environment.
